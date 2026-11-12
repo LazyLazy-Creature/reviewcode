@@ -3,8 +3,6 @@ name: AI Code Review
 on:
   push:
     branches: [main, master]
-  pull_request:
-    branches: [main, master]
 
 permissions:
   contents: read
@@ -25,17 +23,11 @@ jobs:
           distribution: temurin
           java-version: "11"
 
-      - name: Download reviewer
-        env:
-          GH_TOKEN: ${{ secrets.REVIEWER_DOWNLOAD_TOKEN }}
-        run: |
-          gh release download v1.0.0 \
-            --repo LazyLazy-Creature/openai-code-review-weixin-push \
-            --pattern openai-code-review-sdk-1.0.jar \
-            --dir .
-          mv openai-code-review-sdk-1.0.jar openai-code-review-sdk.jar
+      - name: Verify reviewer package
+        run: jar tf .github/tools/openai-code-review-sdk-1.0.jar > /dev/null
+
       - name: Run review
-        run: java -jar openai-code-review-sdk.jar
+        run: java -jar .github/tools/openai-code-review-sdk-1.0.jar
         env:
           GITHUB_TOKEN: ${{ secrets.CODE_TOKEN }}
           GLM_API_KEY: ${{ secrets.GLM_API_KEY }}
