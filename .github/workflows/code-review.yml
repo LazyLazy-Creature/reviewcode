@@ -1,0 +1,40 @@
+name: AI Code Review
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "11"
+
+      - name: Download reviewer
+        run: |
+          curl -L \
+            -o openai-code-review-sdk.jar \
+            https://github.com/LazyLazy-Creature/openai-code-review-weixin-push/releases/download/v1.0.0/openai-code-review-sdk-1.0.jar
+
+      - name: Run review
+        run: java -jar openai-code-review-sdk.jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.CODE_TOKEN }}
+          GLM_API_KEY: ${{ secrets.GLM_API_KEY }}
+          WECHAT_APP_ID: ${{ secrets.WECHAT_APP_ID }}
+          WECHAT_APP_SECRET: ${{ secrets.WECHAT_APP_SECRET }}
