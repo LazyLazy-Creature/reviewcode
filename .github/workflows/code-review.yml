@@ -26,11 +26,14 @@ jobs:
           java-version: "11"
 
       - name: Download reviewer
+        env:
+          GH_TOKEN: ${{ secrets.REVIEWER_DOWNLOAD_TOKEN }}
         run: |
-          curl -L \
-            -o openai-code-review-sdk.jar \
-            https://github.com/LazyLazy-Creature/openai-code-review-weixin-push/releases/download/v1.0.0/openai-code-review-sdk-1.0.jar
-
+          gh release download v1.0.0 \
+            --repo LazyLazy-Creature/openai-code-review-weixin-push \
+            --pattern openai-code-review-sdk-1.0.jar \
+            --dir .
+          mv openai-code-review-sdk-1.0.jar openai-code-review-sdk.jar
       - name: Run review
         run: java -jar openai-code-review-sdk.jar
         env:
